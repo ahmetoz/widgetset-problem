@@ -1,11 +1,11 @@
 package com.example.demo;
 
 import com.google.gwt.core.ext.typeinfo.JClassType;
-import com.vaadin.client.connectors.grid.GridConnector;
 import com.vaadin.client.ui.button.ButtonConnector;
 import com.vaadin.client.ui.combobox.ComboBoxConnector;
 import com.vaadin.client.ui.csslayout.CssLayoutConnector;
 import com.vaadin.client.ui.customcomponent.CustomComponentConnector;
+import com.vaadin.client.ui.datefield.DateFieldConnector;
 import com.vaadin.client.ui.datefield.InlineDateFieldConnector;
 import com.vaadin.client.ui.datefield.PopupDateFieldConnector;
 import com.vaadin.client.ui.label.LabelConnector;
@@ -17,7 +17,9 @@ import com.vaadin.client.ui.textfield.TextFieldConnector;
 import com.vaadin.client.ui.ui.UIConnector;
 import com.vaadin.client.ui.window.WindowConnector;
 import com.vaadin.server.widgetsetutils.ConnectorBundleLoaderFactory;
+import com.vaadin.shared.ui.Connect;
 import com.vaadin.shared.ui.Connect.LoadStyle;
+import com.vaadin.ui.DateField;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,13 +41,17 @@ public class OptimizedConnectorBundleLoaderFactory extends ConnectorBundleLoader
         eagerConnectors.add(ComboBoxConnector.class.getName());
         eagerConnectors.add(CustomComponentConnector.class.getName());
         eagerConnectors.add(WindowConnector.class.getName());
+        eagerConnectors.add(DateFieldConnector.class.getName());
         eagerConnectors.add(InlineDateFieldConnector.class.getName());
         eagerConnectors.add(PopupDateFieldConnector.class.getName());
-        eagerConnectors.add(GridConnector.class.getName());
     }
 
     @Override
     protected LoadStyle getLoadStyle(final JClassType connectorType) {
+        Connect annotation = connectorType.getAnnotation(Connect.class);
+        LoadStyle loadStyleFromAnnotation = annotation.loadStyle();
+        if (loadStyleFromAnnotation == LoadStyle.LAZY) return loadStyleFromAnnotation;
+
         if (eagerConnectors.contains(connectorType.getQualifiedBinaryName())) {
             return LoadStyle.EAGER;
         } else {
